@@ -5,23 +5,25 @@ use itertools::Itertools;
 /// Part 1: find two numbers that add up to 2020, then multiply.
 /// Part 2: find three numbers that add up to 2020, then multiply.
 
-fn read_reports(name: &str) -> std::io::Result<HashSet<u32>> {
-    let contents = std::fs::read_to_string(name)?;
-    Ok(contents
-        .lines()
-        .map(|s| s.trim().parse().unwrap())
-        .collect())
+fn read_reports() -> Vec<u32> {
+    // Thanks to Pierre for learning this macro + split_terminator()!
+    let data = include_str!("input.txt");
+    data.split_terminator('\n')
+        .map(|s| s.parse().unwrap())
+        .collect()
 }
 
-fn find_pair(reports: &HashSet<u32>) -> Option<(u32, u32)> {
-    for report in reports {
-        let complement = 2020u32.checked_sub(*report);
+/// O(n), thanks to the HashSet.
+fn find_pair(reports: &[u32]) -> Option<(u32, u32)> {
+    let reports: HashSet<&u32> = reports.iter().collect();
+    for report in &reports {
+        let complement = 2020u32.checked_sub(**report);
         match complement {
             None => continue,
             Some(complement) => match reports.get(&complement) {
                 None => continue,
                 Some(second) => {
-                    let mut result = [*report, *second];
+                    let mut result = [**report, **second];
                     // NB: We sort for determinism, given that we use a hash set.
                     result.sort_unstable();
                     return Some((result[0], result[1]));
@@ -32,8 +34,9 @@ fn find_pair(reports: &HashSet<u32>) -> Option<(u32, u32)> {
     None
 }
 
+/// O(n^3).
 fn find_triplet(reports: &[u32]) -> Option<(u32, u32, u32)> {
-    reports.into_iter().combinations(3).find_map(|comb| {
+    reports.iter().combinations(3).find_map(|comb| {
         let (v0, v1, v2) = (*comb[0], *comb[1], *comb[2]);
         if v0 + v1 + v2 == 2020 {
             Some((v0, v1, v2))
@@ -44,7 +47,7 @@ fn find_triplet(reports: &[u32]) -> Option<(u32, u32, u32)> {
 }
 
 fn main() {
-    let reports = read_reports("src/input.txt").unwrap();
+    let reports = read_reports();
     match find_pair(&reports) {
         None => {
             eprintln!("No two reports found that add up to 2020.");
@@ -55,7 +58,7 @@ fn main() {
             println!("Pair result: {}", result)
         }
     }
-    match find_triplet(&reports.into_iter().collect_vec()) {
+    match find_triplet(&reports) {
         None => {
             eprintln!("No three reports found that add up to 2020.");
             std::process::exit(1);
