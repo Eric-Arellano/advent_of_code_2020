@@ -1,0 +1,10 @@
+[package]
+name = "d1_report-repair"
+version = "0.1.0"
+authors = ["Eric Arellano <ericarellano@me.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+itertools = "0.9.0"
