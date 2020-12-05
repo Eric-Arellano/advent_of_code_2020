@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 /// Find the number of valid passwords.
 
 struct PasswordPolicy {
@@ -16,11 +14,7 @@ impl PasswordPolicy {
     /// The letter appears a # of times within the given range (inclusive).
     /// O(c), where c is # characters.
     fn is_valid_policy1(&self, s: &str) -> bool {
-        let mut char_map = HashMap::with_capacity(s.len().min(26));
-        for c in s.chars() {
-            *char_map.entry(c).or_insert(0) += 1;
-        }
-        let count = *char_map.get(&self.letter).unwrap_or(&0);
+        let count = s.chars().filter(|c| *c == self.letter).count() as u8;
         count >= self.num1 && count <= self.num2
     }
 
@@ -29,7 +23,7 @@ impl PasswordPolicy {
     fn is_valid_policy2(&self, s: &str) -> bool {
         let char_matches = |i: u8| {
             if i < 1 {
-                return false
+                return false;
             }
             // Adjust from one-index to zero-index.
             let i = i - 1;
